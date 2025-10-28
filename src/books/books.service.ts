@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Book } from './entities/book.entity';
+import { plainToInstance } from 'class-transformer'
+import { BookRespDto } from './dto/book-resp.dto/book-resp.dto';
 
 @Injectable()
 export class BooksService {
@@ -13,8 +15,13 @@ export class BooksService {
     return this.bookRepository.save(createBookDto);
   }
 
-  findAll(): Promise<Book[]> {
-    return this.bookRepository.find();
+  async findAll(): Promise<BookRespDto[]> {
+    const books = await this.bookRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    return plainToInstance(BookRespDto, books, { excludeExtraneousValues: true });
   }
 
   findOne(id: number): Promise<Book> {

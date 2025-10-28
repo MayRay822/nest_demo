@@ -6,22 +6,26 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { Book } from './entities/book.entity';
-
+import { CreateBookDto } from './dto/create-book.dto/create-book.dto';
+import { BookRespDto } from './dto/book-resp.dto/book-resp.dto';
 
 @Controller('books')
+@UseInterceptors(ClassSerializerInterceptor)
 export class BooksController {
   constructor(private readonly booksService: BooksService) { }
 
   @Post()
-  create(@Body() createBookDto: Partial<Book>) {
+  create(@Body() createBookDto: CreateBookDto) {
     return this.booksService.create(createBookDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<BookRespDto[]> {
     return this.booksService.findAll();
   }
 
